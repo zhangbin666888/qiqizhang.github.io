@@ -69,6 +69,67 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-nio-aio-概念的理解和学习" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/qiqizhang.github.io/2018/03/01/nio-aio-概念的理解和学习/" class="article-date">
+  <time datetime="2018-03-01T09:55:56.000Z" itemprop="datePublished">2018-03-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/qiqizhang.github.io/2018/03/01/nio-aio-概念的理解和学习/">nio aio 概念的理解和学习</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>1.Java NIO中的同步、异步、阻塞和非阻塞（非NIO2.0）<br>在不同的上下文环境中，Java NIO的模式可以说成是同步、异步、阻塞、非阻塞，关注点不同，结论不同，本文主要记录自己的理解。</p>
+<p>为什么说是同步</p>
+<p>按照UNIX网络编程模型的说法，Java NIO使用的I/O复用模型在select调用上发生了阻塞，因此不属于异步I/O，参见原文定义：</p>
+<p>An asynchronous I/O operation does not cause the requesting process to be blocked.</p>
+<p>数据准备好（就绪）后，用户线程仍需要主动同步进行I/O读写操作，而真正的异步I/O模型下，用户线程不参与拷贝读写，如下图：</p>
+<p>为什么说是异步</p>
+<p>用户线程注册事件处理器Selector之后可以继续执行做其他的工作，而Selector线程负责调用内核的select函数检查socket状态。当有socket被激活时，则通知相应的用户线程（或执行用户线程的回调函数），执行handle_event进行数据读取、处理的工作。这种通知调用方式属于异步调用。</p>
+<p>NIO类库支持非阻塞读和写操作，相比于同步阻塞读写，是异步的，这里的异步和非阻塞是同义语</p>
+<p>为什么说是阻塞</p>
+<p>select调用是阻塞的，如下图：</p>
+<p>NIO类库也支持通道的阻塞模式（configureBlocking方法设置为true），但是如果向一个或多个选择器注册了此通道，则尝试将此通道置于阻塞模式将导致抛出 IllegalBlockingModeException，一般设置为非阻塞。<br>为什么说是非阻塞</p>
+<p>NIO类库支持非阻塞读和写操作，向选择器selector注册的通道一般为非阻塞模式<br>2.关于非阻塞读写<br>这里所说的非阻塞是针对I/O模型里面的数据拷贝阶段，如recvfrom函数调用，而不是非阻塞I/O模型（图6.6）</p>
+<p>这里所说的非阻塞是指socket函数本身（如recvfrom）可以设置为阻塞和非阻塞模式，阻塞模式意味着必须要做完IO操作（包括错误）才会返回。 非阻塞模式下无论操作是否完成都会立刻返回，需要通过其他方式来判断具体操作是否成功</p>
+<p>对于读而言：阻塞和非阻塞I/O的区别在于没有数据到达的时候是否立刻返回</p>
+<p>对于写而言：在阻塞I/O的情况是会一直等待直到write完全部的数据再返回，这个和阻塞读有区别。非阻塞写的情况下，是采用可以写多少就写多少的策略</p>
+<ol>
+<li>关于异步I/O（NIO2.0）<br>为什么说AIO是真正的异步I/O<br>当用户线程收到通知时，数据已经被内核读取完毕，并放在了用户线程指定的缓冲区内，内核在IO完成后通知用户线程直接使用即可，在整个过程中，用户线程除了发起请求之外未参与任何I/O相关的操作，也并未被任何函数阻塞。</li>
+</ol>
+<p>AIO与NIO的区别，在Client端体现为用户线程得到通知的时间点</p>
+<p>在NIO中，当发生相应读写事件时，用户线程得到通知，表明数据已就绪，开始同步调用非阻塞读写函数，Java API如下：</p>
+<p>java.nio.channels.SocketChannel.read(ByteBuffer dst)<br>java.nio.channels.SocketChannel.write(ByteBuffer src)<br>在AIO中，当发生相应事件时，用户线程得到通知，表明I/O操作已经由操作系统异步完成，用户线程只需事先向内核申明I/O缓冲区、注册handler并定义回调的completed方法即可，Java API如下：</p>
+<p>java.nio.channels.AsynchronousSocketChannel.read(ByteBuffer dst, ByteBuffer attachment, CompletionHandler&lt;Integer, ? super ByteBuffer&gt; handler)<br>java.nio.channels.AsynchronousSocketChannel.write(ByteBuffer src, ByteBuffer attachment, CompletionHandler&lt;Integer, ? super ByteBuffer&gt; handler)<br>AIO与NIO的区别，在Server端体现为Reactor/Proactor的区别，在NIO中，监控的事件通常为数据的到达；在AIO中，监控的是事件通常为I/O的完成</p>
+<p>作者：snowind09<br>链接：<a href="https://www.jianshu.com/p/76231686d81f" target="_blank" rel="noopener">https://www.jianshu.com/p/76231686d81f</a><br>來源：简书<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/03/01/nio-aio-概念的理解和学习/" data-id="cje7v0dky0001b0vnll7p8gzk" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/qiqizhang.github.io/tags/nio-aio/">nio aio</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-protobuf-在java项目中的应用" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/qiqizhang.github.io/2018/03/01/protobuf-在java项目中的应用/" class="article-date">
@@ -273,7 +334,7 @@ public static void main(String[] args) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/03/01/protobuf-在java项目中的应用/" data-id="cje6xe6rv0002isvnnj9z5z7p" class="article-share-link">Teilen</a>
+      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/03/01/protobuf-在java项目中的应用/" data-id="cje7v0dl80004b0vndfs0g7qe" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -310,7 +371,7 @@ public static void main(String[] args) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/27/moquette-mqtt/" data-id="cje6xe6rt0001isvnvs6edqk3" class="article-share-link">Teilen</a>
+      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/27/moquette-mqtt/" data-id="cje7v0dkt0000b0vntii3fiq7" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/qiqizhang.github.io/tags/moquette-mqtt/">moquette mqtt</a></li></ul>
@@ -373,125 +434,7 @@ public static void main(String[] args) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/25/孕期经验分享/" data-id="cje6xe6s80007isvn1b6gc0hb" class="article-share-link">Teilen</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-第二个博客" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/qiqizhang.github.io/2018/02/24/第二个博客/" class="article-date">
-  <time datetime="2018-02-24T15:47:47.000Z" itemprop="datePublished">2018-02-24</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/qiqizhang.github.io/2018/02/24/第二个博客/">第二个博客</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>枯井sljfshkfahsdkf<br>adskfskadhfasd<br>asdfasdfsadfsdfasdf<br>枯井sljfshkfahsdkf<br>adskfskadhfasd<br>asdfasdfsadfsdfasdf<br>枯井sljfshkfahsdkf<br>adskfskadhfasd<br>asdfasdfsadfsdfasdf枯井sljfshkfahsdkf<br>adskfskadhfasd<br>asdfasdfsadfsdfasdf<br>枯井sljfshkfahsdkf<br>adskfskadhfasd<br>asdfasdfsadfsdfasdf枯井sljfshkfahsdkf枯井sljfshkfahsdkf<br>adskfskadhfasd<br>asdfasdfsadfsdfasdf</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/24/第二个博客/" data-id="cje6xe6rz0005isvntldb6sn3" class="article-share-link">Teilen</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-我的第一篇文章" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/qiqizhang.github.io/2018/02/24/我的第一篇文章/" class="article-date">
-  <time datetime="2018-02-24T10:01:27.000Z" itemprop="datePublished">2018-02-24</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/qiqizhang.github.io/2018/02/24/我的第一篇文章/">我的第一篇文章</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/24/我的第一篇文章/" data-id="cje6xe6ry0004isvnex7kdmvk" class="article-share-link">Teilen</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/qiqizhang.github.io/2018/02/23/hello-world/" class="article-date">
-  <time datetime="2018-02-23T09:53:17.420Z" itemprop="datePublished">2018-02-23</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/qiqizhang.github.io/2018/02/23/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/23/hello-world/" data-id="cje6xe6ro0000isvniuju8gh5" class="article-share-link">Teilen</a>
+      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/25/孕期经验分享/" data-id="cje7v0dl60003b0vn8lwxau4y" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -514,7 +457,7 @@ public static void main(String[] args) {
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/qiqizhang.github.io/tags/moquette-mqtt/">moquette mqtt</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/qiqizhang.github.io/tags/moquette-mqtt/">moquette mqtt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/qiqizhang.github.io/tags/nio-aio/">nio aio</a></li></ul>
     </div>
   </div>
 
@@ -524,7 +467,7 @@ public static void main(String[] args) {
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/qiqizhang.github.io/tags/moquette-mqtt/" style="font-size: 10px;">moquette mqtt</a>
+      <a href="/qiqizhang.github.io/tags/moquette-mqtt/" style="font-size: 10px;">moquette mqtt</a> <a href="/qiqizhang.github.io/tags/nio-aio/" style="font-size: 10px;">nio aio</a>
     </div>
   </div>
 
@@ -533,7 +476,7 @@ public static void main(String[] args) {
   <div class="widget-wrap">
     <h3 class="widget-title">Archiv</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/qiqizhang.github.io/archives/2018/02/">February 2018</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/qiqizhang.github.io/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/qiqizhang.github.io/archives/2018/02/">February 2018</a></li></ul>
     </div>
   </div>
 
@@ -546,6 +489,10 @@ public static void main(String[] args) {
       <ul>
         
           <li>
+            <a href="/qiqizhang.github.io/2018/03/01/nio-aio-概念的理解和学习/">nio aio 概念的理解和学习</a>
+          </li>
+        
+          <li>
             <a href="/qiqizhang.github.io/2018/03/01/protobuf-在java项目中的应用/">protobuf 在java项目中的应用</a>
           </li>
         
@@ -555,14 +502,6 @@ public static void main(String[] args) {
         
           <li>
             <a href="/qiqizhang.github.io/2018/02/25/孕期经验分享/">孕期经验分享</a>
-          </li>
-        
-          <li>
-            <a href="/qiqizhang.github.io/2018/02/24/第二个博客/">第二个博客</a>
-          </li>
-        
-          <li>
-            <a href="/qiqizhang.github.io/2018/02/24/我的第一篇文章/">我的第一篇文章</a>
           </li>
         
       </ul>
