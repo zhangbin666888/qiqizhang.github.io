@@ -69,6 +69,103 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-搭建个人博客" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/qiqizhang.github.io/2018/03/28/搭建个人博客/" class="article-date">
+  <time datetime="2018-03-27T17:23:33.000Z" itemprop="datePublished">2018-03-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/qiqizhang.github.io/2018/03/28/搭建个人博客/">搭建个人博客</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <pre><code>因为我是搞开发的，以前写博客一直是在csdn上写，大家都知道csdn是一个为开发人员服务的集博客、论坛等功能的社区。主要针对的用户群是开发者。但我一直想有一个专属自已的博客，不只是写技术类的文章，还想把自己在生活中的所见所闻记录下来，这样显然在csdn上发表这类文章就有些不合适了。偶然逛另人的博客时看到有人介绍通过hexo可以搭建属于个人风格的博客，欣喜若狂，赶紧耍起来。
+</code></pre><ol>
+<li>安装Git Bash<br>我一直不太喜欢在cmd中操作各种命令，所以挑了这个比较好使的Git Bash, 我的是windows环境，所以下载windows版本并安装就可以了。</li>
+</ol>
+<p>下载地址</p>
+<p>安装步骤：双击下载好的exe文件，一路next就好啦</p>
+<p>安装好后，打开gitbash，查看版本：</p>
+<p>命令：git version (写这篇博客的时候最新版本：2.12.2)</p>
+<p>然后你就可以在这里发挥你的聪明才智了</p>
+<ol>
+<li>安装NodeJs<br>Hexo是基于nodeJS环境的静态博客，里面的npm工具很有用啊，所以还是老老实实把这玩意儿装了吧</li>
+</ol>
+<p>下载地址(说明：LTS为长期支持版，Current为当前最新版)</p>
+<p>安装步骤：反正下载好msi文件后，双击打开安装，也是一路next，不过在Custom Setup这一步记得选 Add to PATH ,这样你就不用自己去配置电脑上环境变量了，装完在按 win + r 快捷键调出运行，然后输入cmd确定，在cmd中输入path可以看到你的node是否配置在里面（环境变量），没有的话你就自由发挥吧。</p>
+<p>查看版本：</p>
+<p>命令：node -v</p>
+<p>又到自由发挥的时候了</p>
+<ol>
+<li>安装hexo<br>先创建一个文件夹（用来存放所有blog的东西），然后cd到该文件夹下。</li>
+</ol>
+<p>安装hexo命令：npm i -g hexo</p>
+<p>安装完成后，查看版本：</p>
+<p>初始化命令：hexo init ，初始化完成之后打开所在的文件夹可以看到以下文件：</p>
+<p>解释一下：</p>
+<p>node_modules：是依赖包</p>
+<p>public：存放的是生成的页面</p>
+<p>scaffolds：命令生成文章等的模板</p>
+<p>source：用命令创建的各种文章</p>
+<p>themes：主题</p>
+<p>_config.yml：整个博客的配置</p>
+<p>db.json：source解析所得到的</p>
+<p>package.json：项目所需模块项目的配置信息</p>
+<p>做好这些前置工作之后接下来的就是各种配配配置了。</p>
+<ol>
+<li>搭桥到github<br>没账号的创建账号，有账号的看下面。</li>
+</ol>
+<p>添加一个 New SSH key ，title随便取，key就填刚刚那一段。</p>
+<p>在gitbash中验证是否添加成功：ssh -T <a href="mailto:git@github.com" target="_blank" rel="noopener">git@github.com</a></p>
+<p>创建SSH</p>
+<p>在gitbash中输入：ssh-keygen -t rsa -C “<a href="mailto:youremail@example.com" target="_blank" rel="noopener">youremail@example.com</a>，生成ssh。然后按下图的方式找到id_rsa.pub文件的内容。将该内容拷贝到上面github中</p>
+<p>回到gitbash中，配置github账户信息（YourName和YourEail都替换成你自己的）：</p>
+<p>创建一个repo，名称为yourname.github.io, 其中yourname是你的github名称，按照这个规则创建才有用哦，如下：</p>
+<p>  一步之遥</p>
+<pre><code>  1）修改配置文件_config.yml
+
+         deploy:
+
+             type: git
+
+             repo: git@github.com:yourname/yourname.github.io
+
+            branch: master
+
+
+
+2)回到gitbash中，进入你的blog目录，分别执行以下命令：
+</code></pre><p>hexo clean<br>hexo generate<br>hexo server<br>注：hexo 3.0把服务器独立成个别模块，需要单独安装：npm i hexo-server。</p>
+<p>打开浏览器输入：<a href="http://localhost:4000" target="_blank" rel="noopener">http://localhost:4000</a></p>
+<p>接着你就可以遇见天使的微笑了~</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/03/28/搭建个人博客/" data-id="cjf9gg7zt0004z0vnd123cjbx" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/qiqizhang.github.io/tags/hexo-博客/">hexo 博客</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-nio-aio-概念的理解和学习" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/qiqizhang.github.io/2018/03/01/nio-aio-概念的理解和学习/" class="article-date">
@@ -118,7 +215,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/03/01/nio-aio-概念的理解和学习/" data-id="cje7v0dky0001b0vnll7p8gzk" class="article-share-link">Teilen</a>
+      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/03/01/nio-aio-概念的理解和学习/" data-id="cjf9gg7zo0001z0vn772fvf8g" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/qiqizhang.github.io/tags/nio-aio/">nio aio</a></li></ul>
@@ -334,7 +431,7 @@ public static void main(String[] args) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/03/01/protobuf-在java项目中的应用/" data-id="cje7v0dl80004b0vndfs0g7qe" class="article-share-link">Teilen</a>
+      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/03/01/protobuf-在java项目中的应用/" data-id="cjf9gg7zs0003z0vnzf1e5zqu" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -371,7 +468,7 @@ public static void main(String[] args) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/27/moquette-mqtt/" data-id="cje7v0dkt0000b0vntii3fiq7" class="article-share-link">Teilen</a>
+      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/27/moquette-mqtt/" data-id="cjf9gg7zj0000z0vnqfs3vf37" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/qiqizhang.github.io/tags/moquette-mqtt/">moquette mqtt</a></li></ul>
@@ -434,7 +531,7 @@ public static void main(String[] args) {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/25/孕期经验分享/" data-id="cje7v0dl60003b0vn8lwxau4y" class="article-share-link">Teilen</a>
+      <a data-url="https://zhangbin666888.github.io/qiqizhang.github.io/2018/02/25/孕期经验分享/" data-id="cjf9gg7zv0005z0vnwu9wzjps" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -457,7 +554,7 @@ public static void main(String[] args) {
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/qiqizhang.github.io/tags/moquette-mqtt/">moquette mqtt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/qiqizhang.github.io/tags/nio-aio/">nio aio</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/qiqizhang.github.io/tags/hexo-博客/">hexo 博客</a></li><li class="tag-list-item"><a class="tag-list-link" href="/qiqizhang.github.io/tags/moquette-mqtt/">moquette mqtt</a></li><li class="tag-list-item"><a class="tag-list-link" href="/qiqizhang.github.io/tags/nio-aio/">nio aio</a></li></ul>
     </div>
   </div>
 
@@ -467,7 +564,7 @@ public static void main(String[] args) {
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/qiqizhang.github.io/tags/moquette-mqtt/" style="font-size: 10px;">moquette mqtt</a> <a href="/qiqizhang.github.io/tags/nio-aio/" style="font-size: 10px;">nio aio</a>
+      <a href="/qiqizhang.github.io/tags/hexo-博客/" style="font-size: 10px;">hexo 博客</a> <a href="/qiqizhang.github.io/tags/moquette-mqtt/" style="font-size: 10px;">moquette mqtt</a> <a href="/qiqizhang.github.io/tags/nio-aio/" style="font-size: 10px;">nio aio</a>
     </div>
   </div>
 
@@ -487,6 +584,10 @@ public static void main(String[] args) {
     <h3 class="widget-title">letzter Beitrag</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/qiqizhang.github.io/2018/03/28/搭建个人博客/">搭建个人博客</a>
+          </li>
         
           <li>
             <a href="/qiqizhang.github.io/2018/03/01/nio-aio-概念的理解和学习/">nio aio 概念的理解和学习</a>
